@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Plate Number :"
+        android:id="@+id/plateNoTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="33dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Duration (per hour) :"
+        android:id="@+id/durationTextView"
+        android:layout_below="@+id/plateNoTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="30dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Time :"
+        android:id="@+id/timeTextView"
+        android:layout_below="@+id/durationTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="28dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Rate per Hour :"
+        android:id="@+id/rateTextView"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Total :"
+        android:id="@+id/totalTextView"
+        android:layout_below="@+id/rateTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="25dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/plateNoEditText"
+        android:layout_alignBottom="@+id/plateNoTextView"
+        android:layout_toRightOf="@+id/durationTextView" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="time"
+        android:ems="10"
+        android:id="@+id/time1EditText"
+        android:layout_alignRight="@+id/plateNoEditText"
+        android:layout_alignEnd="@+id/plateNoEditText"
+        android:layout_alignBottom="@+id/time2EditText"
+        android:layout_alignLeft="@+id/edtxtTotal"
+        android:layout_alignStart="@+id/edtxtTotal" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="time"
+        android:ems="10"
+        android:id="@+id/time2EditText"
+        android:layout_alignTop="@+id/timeTextView"
+        android:layout_toRightOf="@+id/btnPaypal"
+        android:layout_toEndOf="@+id/btnPaypal" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/durationSpinner"
+        android:layout_alignBottom="@+id/durationTextView"
+        android:layout_toRightOf="@+id/durationTextView"
+        android:layout_toEndOf="@+id/durationTextView"
+        android:spinnerMode="dropdown" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/edtxtRate"
+        android:layout_alignTop="@+id/rateTextView"
+        android:layout_toRightOf="@+id/rateTextView"
+        android:layout_toEndOf="@+id/rateTextView" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/edtxtTotal"
+        android:layout_alignTop="@+id/totalTextView"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Paypal"
+        android:id="@+id/btnPaypal"
+        android:layout_marginTop="42dp"
+        android:layout_below="@+id/edtxtTotal"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>
