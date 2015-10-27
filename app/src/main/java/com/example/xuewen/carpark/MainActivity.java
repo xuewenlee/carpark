@@ -1,5 +1,6 @@
 package com.example.xuewen.carpark;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -7,6 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
+
+
         /* Spinner */
         /////////////////Spinner spinner = (Spinner) findViewById(R.id.durationSpinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
@@ -46,31 +51,31 @@ public class MainActivity extends AppCompatActivity {
         // Apply the adapter to the spinner
         ////////spinner.setAdapter(adapter);
 
-        Spinner dropdown = (Spinner)findViewById(R.id.durationSpinner);
-//        String[] items = new String[]{"1", "2", "3"};
+        Spinner dropdown = (Spinner)findViewById(R.id.planets_spinner);
+        String[] items = new String[]{"1", "2", "3"};
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.durationHour, android.R.layout.simple_spinner_dropdown_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         dropdown.setAdapter(adapter);
-
-        Button buttnnPaypal = (Button) findViewById(R.id.btnPaypal);
-        buttnnPaypal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<NameValuePair> params = new
-                        ArrayList<NameValuePair>();
-                params.add(new
-                        BasicNameValuePair("user", "popo"));
-                String strURL = "http://localhost/webServiceJSON/helloJSON.php";
-            /*JSONParser objJSONParser = new JSONParser();*/
-                JSONObject jsonObj =
-                        makeHttpRequest(strURL, "POST", params);
-                String strFromPHP = jsonObj.optString("message");
-                EditText editTextRate = (EditText) findViewById(R.id.edtxtRate);
-                editTextRate.setText(strFromPHP);
-            }
-        });
-        super.onSaveInstanceState(savedInstanceState);
+//
+//        Button buttnnPaypal = (Button) findViewById(R.id.btnPaypal);
+//        buttnnPaypal.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                List<NameValuePair> params = new
+//                        ArrayList<NameValuePair>();
+//                params.add(new
+//                        BasicNameValuePair("user", "popo"));
+//                String strURL = "http://localhost/webServiceJSON/helloJSON.php";
+//            /*JSONParser objJSONParser = new JSONParser();*/
+//                JSONObject jsonObj =
+//                        makeHttpRequest(strURL, "POST", params);
+//                String strFromPHP = jsonObj.optString("message");
+//                EditText editTextRate = (EditText) findViewById(R.id.edtxtRate);
+//                editTextRate.setText(strFromPHP);
+//            }
+//        });
+//        super.onSaveInstanceState(savedInstanceState);
 
     }
 
@@ -115,5 +120,33 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+
+    public void testing(View view){
+        Toast.makeText(getApplicationContext(), "testing", Toast.LENGTH_SHORT).show();
+        TextView textView = (TextView)findViewById(R.id.timeTextView);
+        textView.setText("hi");
+    }
+
+
+
+
+    public void onClick(View v) {
+
+
+        List<NameValuePair> params = new
+                ArrayList<NameValuePair>();
+        params.add(new
+                BasicNameValuePair("user", "popo"));
+        String strURL = "http://localhost/webServiceJSON/helloJSON.php";
+
+        /*JSONParser objJSONParser = new JSONParser();*/
+//        JSONObject jsonObj =
+//                makeHttpRequest(strURL, "POST", params);
+//        String strFromPHP = jsonObj.optString("message");
+//        EditText editTextRate = (EditText) findViewById(R.id.edtxtRate);
+//        editTextRate.setText(strFromPHP);
+
+
+    }
 
 }

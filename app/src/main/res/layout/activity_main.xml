@@ -88,15 +88,6 @@
         android:layout_toRightOf="@+id/btnPaypal"
         android:layout_toEndOf="@+id/btnPaypal" />
 
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/durationSpinner"
-        android:layout_alignBottom="@+id/durationTextView"
-        android:layout_toRightOf="@+id/durationTextView"
-        android:layout_toEndOf="@+id/durationTextView"
-        android:spinnerMode="dropdown" />
-
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -71,12 +71,29 @@
         android:layout_alignBottom="@+id/plateNoTextView"
         android:layout_toRightOf="@+id/durationTextView" />
 
-    <NumberPicker
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/numberPicker"
-        android:layout_above="@+id/timeTextView"
-        android:layout_toRightOf="@+id/plateNoEditText"
-        android:layout_toEndOf="@+id/plateNoEditText" />
+        android:text="New Button"
+        android:id="@+id/button"
+        android:layout_below="@+id/timeTextView"
+        android:layout_toRightOf="@+id/rateTextView"
+        android:layout_toEndOf="@+id/rateTextView"
+        android:onClick="testing"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Button"
+        android:id="@+id/btnPaypal"
+        android:layout_below="@+id/totalTextView"
+        android:layout_toRightOf="@+id/textView2"
+        android:layout_toEndOf="@+id/textView2"
+        android:onClick="onClick"/>
+
+    <Spinner
+        android:id="@+id/planets_spinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>
