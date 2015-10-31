@@ -3,10 +3,9 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
-
     defaultConfig {
         applicationId "com.example.xuewen.carpark"
-        minSdkVersion 7
+        minSdkVersion 11
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -22,6 +21,8 @@ android {
         exclude 'META-INF/NOTICE.txt'
 
     }
+    productFlavors {
+    }
 }
 
 dependencies {
@@ -32,6 +33,8 @@ dependencies {
     compile files('libs/javaJSONlib/apache-httpcomponents-httpcore.jar')
     compile files('libs/javaJSONlib/commons-logging-1.2.jar')
     compile files('libs/javaJSONlib/java-json.jar')
+    compile 'com.android.support:appcompat-v7:23.1.0'
+    compile 'commons-net:commons-net:3.3'
 }
 
 
