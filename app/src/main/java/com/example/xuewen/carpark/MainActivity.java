@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     static InputStream is = null;
     NumberPicker noPicker = null;
-
+    Date dt = null;
 
 
     @Override
@@ -66,41 +66,11 @@ public class MainActivity extends AppCompatActivity {
 //        Date time = new Date(returnTime);
 //        System.out.println("Time from " + TIME_SERVER + ": " + time);
 
-        /* number picker for time -hour*/
-        noPicker = (NumberPicker)findViewById(R.id.numberPicker);
-        noPicker.setMaxValue(9);
-        noPicker.setMinValue(3);
-        noPicker.setWrapSelectorWheel(false);
-        String number = "" + noPicker.getValue();
-        long increment = Long.parseLong(number);
 
-
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd:HH:mm");
-//        String currentDateandTime = sdf.format(new Date());
-//        TextView textView2 = (TextView)findViewById(R.id.txtVwStartTime);
-//        // textView is the TextView view that should display it
-//        textView2.setText(currentDateandTime);
-//
-//        Date date = format.parse(currentDateandTime);
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(date);
-//        calendar.add(Calendar.HOUR, 1);
-//
-//        System.out.println("Time here " + calendar.getTime());
-//
-//        Date session_expiry = new Date(previous_time.getTime() + 60 * 60 * 1000);
-//
-//
-//
-//        DateFormat.getDateTimeInstance().format(new Date());
-//        TextView textView3 = (TextView)findViewById(R.id.txtVwEndTime);
-//        // textView is the TextView view that should display it
-//        textView3.setText(endDateTimeString);
-
-        /* time-hour */
+          /* time-hour */
 //        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
         TextView textViewct = (TextView)findViewById(R.id.txtVwStartTime);
-        Date dt = new Date();
+        dt = new Date();
         int hours = dt.getHours();
         int minutes = dt.getMinutes();
         int seconds = dt.getSeconds();
@@ -108,36 +78,28 @@ public class MainActivity extends AppCompatActivity {
         // textView is the TextView view that should display it
         textViewct.setText(curTime);
 
-        Date dtct = new Date();
-        long newTime = dt.getTime() + (increment)/1000;
-        Date newData = new Date(newTime);
-        int nhours = newData.getHours();
-        int nminutes = newData.getMinutes();
-        int nseconds = newData.getSeconds();
-        String newTimeString = nhours + ":" + nminutes + ":" + nseconds;
-        TextView endtextView = (TextView)findViewById(R.id.txtVwEndTime);
-        endtextView.setText(newTimeString);
 
-
-
-        /* time from network*/
-//        try {
-//            TimeTCPClient client = new TimeTCPClient();
-//            try {
-//                // Set timeout of 60 seconds
-//                client.setDefaultTimeout(60000);
-//                // Connecting to time server
-//                // Other time servers can be found at : http://tf.nist.gov/tf-cgi/servers.cgi#
-//                // Make sure that your program NEVER queries a server more frequently than once every 4 seconds
-//                client.connect("nist.time.nosc.us");
-//                System.out.println(client.getDate());
-//            } finally {
-//                client.disconnect();
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
+        /* number picker for time -hour*/
+        noPicker = (NumberPicker)findViewById(R.id.numberPicker);
+        noPicker.setMaxValue(9);
+        noPicker.setMinValue(1);
+        noPicker.setWrapSelectorWheel(true);
+        noPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                String number = "" + noPicker.getValue();
+                long increment = Long.parseLong(number);
+                Date dtct = new Date();
+                long newTime = dt.getTime() + (increment)*3600000;
+                Date newData = new Date(newTime);
+                int nhours = newData.getHours();
+                int nminutes = newData.getMinutes();
+                int nseconds = newData.getSeconds();
+                String newTimeString = nhours + ":" + nminutes + ":" + nseconds;
+                TextView endtextView = (TextView)findViewById(R.id.txtVwEndTime);
+                endtextView.setText(newTimeString);
+            }
+        });
 
 
         /* Spinner */
@@ -177,80 +139,71 @@ public class MainActivity extends AppCompatActivity {
             final List<NameValuePair> params)
     {
 
-        Runnable run1 = new Runnable(){
-            @Override
-            public void run() {
-                InputStream is = null;
-                String json = "";
-                JSONObject jObj = null;
 
-                // Making HTTP request
-                try {
+        InputStream is = null;
+        String json = "";
+        JSONObject jObj = null;
 
-                    // check for request method
-                    if(method == "POST"){
-                        // request method is POST
-                        // defaultHttpClient
-                        DefaultHttpClient httpClient = new DefaultHttpClient();
-                        HttpPost httpPost = new HttpPost(url);
-                        httpPost.setEntity(new UrlEncodedFormEntity(params));
+        // Making HTTP request
+        try {
 
-                        HttpResponse httpResponse = httpClient.execute(httpPost);
-                        HttpEntity httpEntity = httpResponse.getEntity();
-                        is = httpEntity.getContent();
+            // check for request method
+            if(method == "POST"){
+                // request method is POST
+                // defaultHttpClient
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpPost httpPost = new HttpPost(url);
+                httpPost.setEntity(new UrlEncodedFormEntity(params));
 
-                    }else if(method == "GET"){
-                        // request method is GET
-                        DefaultHttpClient httpClient = new DefaultHttpClient();
-                        String paramString = URLEncodedUtils.format(params,
-                                "utf-8");
-                        url += "?" + paramString;
-                        HttpGet httpGet = new HttpGet(url);
+                HttpResponse httpResponse = httpClient.execute(httpPost);
+                HttpEntity httpEntity = httpResponse.getEntity();
+                is = httpEntity.getContent();
 
-                        HttpResponse httpResponse = httpClient.execute(httpGet);
-                        HttpEntity httpEntity = httpResponse.getEntity();
-                        is = httpEntity.getContent();
-                    }
+            }else if(method == "GET"){
+                // request method is GET
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                String paramString = URLEncodedUtils.format(params,
+                        "utf-8");
+                url += "?" + paramString;
+                HttpGet httpGet = new HttpGet(url);
 
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (ClientProtocolException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();        }
-
-                try {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(
-                            is, "iso-8859-1"), 8);
-                    StringBuilder sb = new StringBuilder();
-                    String line = null;
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line + "\n");
-                    }
-                    is.close();
-                    json = sb.toString();
-                } catch (Exception e) {
-                    //Log.e("Buffer Error", "Error converting result " + e.toString());
-                }
-
-                // try parse the string to a JSON object
-                try {
-                    jObj = new JSONObject(json);
-                } catch (JSONException e) {
-                    // Log.e("JSON Parser", "Error parsing data " + e.toString());
-                }
-
-                // return JSON String
-                return jObj;
-
+                HttpResponse httpResponse = httpClient.execute(httpGet);
+                HttpEntity httpEntity = httpResponse.getEntity();
+                is = httpEntity.getContent();
             }
 
-        };
-        Thread thread1 = new Thread(run1);
-        thread1.start();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();        }
 
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    is, "iso-8859-1"), 8);
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            is.close();
+            json = sb.toString();
+        } catch (Exception e) {
+            //Log.e("Buffer Error", "Error converting result " + e.toString());
+        }
 
+        // try parse the string to a JSON object
+        try {
+            jObj = new JSONObject(json);
+        } catch (JSONException e) {
+            // Log.e("JSON Parser", "Error parsing data " + e.toString());
+        }
+
+        // return JSON String
+        return jObj;
     }
+
 
 
     public void testing(View view){
@@ -259,24 +212,32 @@ public class MainActivity extends AppCompatActivity {
         textView.setText("hi");
     }
 
-    public void onClickPayPal(View v) {
 
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("message", "aaa"));
-        String strURL = "http://192.168.1.16/webServiceJSON/helloJSON.php";
+
+    public void onClickPayPal(View v) {
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("message", "aaa"));
+                String strURL = "http://192.168.1.16/webServiceJSON/helloJSON.php";
 
         /*JSONParser objJSONParser = new JSONParser();*/
-        JSONObject jsonObj =
-                makeHttpRequest(strURL, "POST", params);
-        String strFromPHP = null;
-        try {
-            strFromPHP = jsonObj.getString("message");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        TextView textView = (TextView)findViewById(R.id.rateTextView);
-        textView.setText(strFromPHP);
+                JSONObject jsonObj =
+                        makeHttpRequest(strURL, "POST", params);
+                String strFromPHP = null;
+                try {
+                    strFromPHP = jsonObj.getString("message");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                TextView textView = (TextView)findViewById(R.id.rateTextView);
+                textView.setText(strFromPHP);
 
+            }
+        };
+        Thread thr = new Thread(run);
+        thr.start();
     }
 
 

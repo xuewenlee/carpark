@@ -120,6 +120,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/numberPicker"
+        android:onClick="onClickNumberPicker"
         android:layout_below="@+id/planets_spinner"
         android:layout_alignRight="@+id/planets_spinner"
         android:layout_alignEnd="@+id/planets_spinner"
