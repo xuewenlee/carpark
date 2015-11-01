@@ -1,21 +1,13 @@
 package com.example.xuewen.carpark;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 
 import android.widget.NumberPicker;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.net.ntp.NTPUDPClient;
-import org.apache.commons.net.ntp.TimeInfo;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -34,16 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.text.DateFormat;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import org.apache.commons.net.time.TimeTCPClient;
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -58,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
-//
 //        NTPUDPClient timeClient = new NTPUDPClient();
 //        InetAddress inetAddress = InetAddress.getByName(TIME_SERVER);
 //        TimeInfo timeInfo = timeClient.getTime(inetAddress);
@@ -67,19 +53,16 @@ public class MainActivity extends AppCompatActivity {
 //        System.out.println("Time from " + TIME_SERVER + ": " + time);
 
 
-          /* time-hour */
+          /* display start time */
 //        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        TextView textViewct = (TextView)findViewById(R.id.txtVwStartTime);
+        TextView textViewct = (TextView)findViewById(R.id.txtVStartTime);
         dt = new Date();
-        int hours = dt.getHours();
-        int minutes = dt.getMinutes();
-        int seconds = dt.getSeconds();
-        String curTime = hours + ":" + minutes + ":" + seconds;
-        // textView is the TextView view that should display it
-        textViewct.setText(curTime);
+        String strDateFormat = "HH:mm:ss a";
+        SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
+        textViewct.setText(sdf.format(dt));
 
 
-        /* number picker for time -hour*/
+        /* number picker for time -hour and display end time*/
         noPicker = (NumberPicker)findViewById(R.id.numberPicker);
         noPicker.setMaxValue(9);
         noPicker.setMinValue(1);
@@ -92,24 +75,19 @@ public class MainActivity extends AppCompatActivity {
                 Date dtct = new Date();
                 long newTime = dt.getTime() + (increment)*3600000;
                 Date newData = new Date(newTime);
-                int nhours = newData.getHours();
-                int nminutes = newData.getMinutes();
-                int nseconds = newData.getSeconds();
-                String newTimeString = nhours + ":" + nminutes + ":" + nseconds;
-                TextView endtextView = (TextView)findViewById(R.id.txtVwEndTime);
-                endtextView.setText(newTimeString);
+                String strDateFormat = "HH:mm:ss a";
+                SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
+                TextView endtextView = (TextView)findViewById(R.id.txtVEndTime);
+                endtextView.setText(sdf.format(newData));
             }
         });
 
-
-        /* Spinner */
-//        Spinner dropdown = (Spinner)findViewById(R.id.planets_spinner);
-//        // Create an ArrayAdapter using the string array and a default spinner layout
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.durationHour, android.R.layout.simple_spinner_dropdown_item);
-//        // Specify the layout to use when the list of choices appears
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        // Apply the adapter to the spinner
-//        dropdown.setAdapter(adapter);
+        /* Display Today Date*/
+        Date date = new Date();
+        String strDate = "dd-MM-yyyy";
+        SimpleDateFormat simpleDate = new SimpleDateFormat(strDate);
+        TextView textViewDate = (TextView)findViewById(R.id.txtVCurrentDate);
+        textViewDate.setText(simpleDate.format(date));
 
 //        Button buttnnPaypal = (Button) findViewById(R.id.btnPaypal);
 //        buttnnPaypal.setOnClickListener(new View.OnClickListener() {
@@ -152,6 +130,9 @@ public class MainActivity extends AppCompatActivity {
                 // request method is POST
                 // defaultHttpClient
                 DefaultHttpClient httpClient = new DefaultHttpClient();
+                String paramString = URLEncodedUtils.format(params, "utf-8");
+                url += "?" + paramString;
+                url = URLDecoder.decode(url);
                 HttpPost httpPost = new HttpPost(url);
                 httpPost.setEntity(new UrlEncodedFormEntity(params));
 
@@ -208,31 +189,38 @@ public class MainActivity extends AppCompatActivity {
 
     public void testing(View view){
         Toast.makeText(getApplicationContext(), "testing", Toast.LENGTH_SHORT).show();
-        TextView textView = (TextView)findViewById(R.id.timeTextView);
+        TextView textView = (TextView)findViewById(R.id.txtVTime);
         textView.setText("hi");
     }
-
-
 
     public void onClickPayPal(View v) {
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("message", "aaa"));
-                String strURL = "http://192.168.1.16/webServiceJSON/helloJSON.php";
-
+                params.add(new BasicNameValuePair("email", "kuhn96@gmail.com"));
+                params.add(new BasicNameValuePair("password", "Kuhn@@@@"));
+//                String strURL = "http://192.168.1.16/webServiceJSON/helloJSON.php";
+                String strURL = "http://pmot-web.192.168.1.13.xip.io/api/v1/auth/login";
         /*JSONParser objJSONParser = new JSONParser();*/
-                JSONObject jsonObj =
+                final JSONObject jsonObj =
                         makeHttpRequest(strURL, "POST", params);
-                String strFromPHP = null;
-                try {
-                    strFromPHP = jsonObj.getString("message");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                TextView textView = (TextView)findViewById(R.id.rateTextView);
-                textView.setText(strFromPHP);
+
+
+                    new Thread() {
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    String strFromPHP = null;
+                                    strFromPHP = jsonObj.optString("token");
+                                    TextView textView = (TextView)findViewById(R.id.txtVRate);
+                                    textView.setText(strFromPHP);
+                                }
+                            });
+                        }
+                    }.start();
+
 
             }
         };

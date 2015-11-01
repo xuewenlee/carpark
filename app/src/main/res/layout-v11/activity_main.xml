@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Plate Number :"
-        android:id="@+id/plateNoTextView"
-        android:layout_alignParentTop="true"
+        android:id="@+id/txtVPlateNo"
+        android:layout_alignBottom="@+id/edTxtPlateNo"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -21,9 +21,19 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Duration (per hour) :"
-        android:id="@+id/durationTextView"
-        android:layout_marginTop="87dp"
-        android:layout_below="@+id/planets_spinner"
+        android:id="@+id/txtVDuration"
+        android:layout_marginTop="72dp"
+        android:layout_below="@+id/txtVPlateNo"
+        android:layout_alignLeft="@+id/txtVTime"
+        android:layout_alignStart="@+id/txtVTime" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Time :"
+        android:id="@+id/txtVTime"
+        android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -31,30 +41,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Time :"
-        android:id="@+id/timeTextView"
-        android:layout_above="@+id/rateTextView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="53dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Rate per Hour :"
-        android:id="@+id/rateTextView"
-        android:layout_above="@+id/totalTextView"
+        android:id="@+id/txtVRate"
+        android:layout_marginBottom="17dp"
+        android:layout_above="@+id/txtVTotal"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="34dp" />
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Total :"
-        android:id="@+id/totalTextView"
+        android:id="@+id/txtVTotal"
         android:layout_above="@+id/btnPaypal"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -63,10 +62,10 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/plateNoEditText"
-        android:layout_alignBottom="@+id/plateNoTextView"
-        android:layout_toRightOf="@+id/durationTextView"
-        android:layout_toEndOf="@+id/durationTextView" />
+        android:id="@+id/edTxtPlateNo"
+        android:text=" "
+        android:layout_toRightOf="@+id/txtVStartTime"
+        android:layout_alignParentTop="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -74,9 +73,9 @@
         android:text="New Button"
         android:id="@+id/button"
         android:onClick="testing"
-        android:layout_alignBottom="@+id/btnPaypal"
-        android:layout_alignLeft="@+id/planets_spinner"
-        android:layout_alignStart="@+id/planets_spinner" />
+        android:layout_below="@+id/txtVTotal"
+        android:layout_alignLeft="@+id/edTxtPlateNo"
+        android:layout_alignStart="@+id/edTxtPlateNo" />
 
     <Button
         android:layout_width="wrap_content"
@@ -85,45 +84,85 @@
         android:id="@+id/btnPaypal"
         android:onClick="onClickPayPal"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/totalTextView"
-        android:layout_toEndOf="@+id/totalTextView" />
+        android:layout_toRightOf="@+id/txtVTotal"
+        android:layout_toEndOf="@+id/txtVTotal" />
 
-    <Spinner
-        android:id="@+id/planets_spinner"
-        android:layout_width="fill_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/plateNoTextView"
+        android:text="Start Time"
+        android:id="@+id/txtVStartTime"
+        android:layout_alignBottom="@+id/txtVTime"
+        android:layout_alignRight="@+id/txtVDuration"
+        android:layout_alignEnd="@+id/txtVDuration" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="End Time"
+        android:id="@+id/txtVEndTime"
+        android:layout_marginRight="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_alignTop="@+id/txtVTo"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toRightOf="@+id/plateNoEditText"
-        android:layout_toEndOf="@+id/plateNoEditText" />
+        android:layout_alignParentEnd="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="startTime"
-        android:id="@+id/txtVwStartTime"
-        android:layout_alignBottom="@+id/timeTextView"
-        android:layout_alignRight="@+id/btnPaypal"
-        android:layout_alignEnd="@+id/btnPaypal" />
+        android:text="Date    :"
+        android:id="@+id/txtVDate"
+        android:layout_above="@+id/txtVRate"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="19dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="EndTime"
-        android:id="@+id/txtVwEndTime"
-        android:layout_alignTop="@+id/txtVwStartTime"
-        android:layout_alignLeft="@+id/button"
-        android:layout_alignStart="@+id/button" />
+        android:text="Today Date"
+        android:id="@+id/txtVCurrentDate"
+        android:layout_alignTop="@+id/txtVDate"
+        android:layout_alignLeft="@+id/txtVStartTime"
+        android:layout_alignStart="@+id/txtVStartTime" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="to"
+        android:id="@+id/txtVTo"
+        android:layout_alignTop="@+id/txtVStartTime"
+        android:layout_toLeftOf="@+id/numberPicker"
+        android:layout_toStartOf="@+id/numberPicker" />
 
     <NumberPicker
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/numberPicker"
         android:onClick="onClickNumberPicker"
-        android:layout_below="@+id/planets_spinner"
-        android:layout_alignRight="@+id/planets_spinner"
-        android:layout_alignEnd="@+id/planets_spinner"
-        android:layout_marginTop="22dp" />
+        android:orientation="horizontal"
+        android:layout_below="@+id/edTxtPlateNo"
+        android:layout_alignRight="@+id/button"
+        android:layout_alignEnd="@+id/button" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Total Price"
+        android:id="@+id/txtVTotalPrice"
+        android:layout_alignTop="@+id/txtVTotal"
+        android:layout_alignRight="@+id/edTxtPlateNo"
+        android:layout_alignEnd="@+id/edTxtPlateNo" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Ringgit per Hour"
+        android:id="@+id/txtVPrice"
+        android:layout_alignTop="@+id/txtVRate"
+        android:layout_toRightOf="@+id/txtVStartTime"
+        android:layout_toEndOf="@+id/txtVStartTime" />
 
 </RelativeLayout>

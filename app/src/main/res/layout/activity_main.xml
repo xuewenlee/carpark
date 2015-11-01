@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Plate Number :"
-        android:id="@+id/plateNoTextView"
+        android:id="@+id/txtVPlateNo"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="33dp" />
@@ -21,8 +21,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Duration (per hour) :"
-        android:id="@+id/durationTextView"
-        android:layout_below="@+id/plateNoTextView"
+        android:id="@+id/txtVDuration"
+        android:layout_below="@+id/txtVPlateNo"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="30dp" />
@@ -32,8 +32,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Time :"
-        android:id="@+id/timeTextView"
-        android:layout_below="@+id/durationTextView"
+        android:id="@+id/txtVTime"
+        android:layout_below="@+id/txtVDuration"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="28dp" />
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Rate per Hour :"
-        android:id="@+id/rateTextView"
+        android:id="@+id/txtVRate"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -53,8 +53,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Total :"
-        android:id="@+id/totalTextView"
-        android:layout_below="@+id/rateTextView"
+        android:id="@+id/txtVTotal"
+        android:layout_below="@+id/txtVRate"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="25dp" />
@@ -62,9 +62,9 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/plateNoEditText"
-        android:layout_alignBottom="@+id/plateNoTextView"
-        android:layout_toRightOf="@+id/durationTextView" />
+        android:id="@+id/edTxtPlateNo"
+        android:layout_alignBottom="@+id/txtVPlateNo"
+        android:layout_toRightOf="@+id/txtVDuration" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -72,8 +72,8 @@
         android:inputType="time"
         android:ems="10"
         android:id="@+id/time1EditText"
-        android:layout_alignRight="@+id/plateNoEditText"
-        android:layout_alignEnd="@+id/plateNoEditText"
+        android:layout_alignRight="@+id/edTxtPlateNo"
+        android:layout_alignEnd="@+id/edTxtPlateNo"
         android:layout_alignBottom="@+id/time2EditText"
         android:layout_alignLeft="@+id/edtxtTotal"
         android:layout_alignStart="@+id/edtxtTotal" />
@@ -84,7 +84,7 @@
         android:inputType="time"
         android:ems="10"
         android:id="@+id/time2EditText"
-        android:layout_alignTop="@+id/timeTextView"
+        android:layout_alignTop="@+id/txtVTime"
         android:layout_toRightOf="@+id/btnPaypal"
         android:layout_toEndOf="@+id/btnPaypal" />
 
@@ -94,9 +94,9 @@
         android:inputType="number"
         android:ems="10"
         android:id="@+id/edtxtRate"
-        android:layout_alignTop="@+id/rateTextView"
-        android:layout_toRightOf="@+id/rateTextView"
-        android:layout_toEndOf="@+id/rateTextView" />
+        android:layout_alignTop="@+id/txtVRate"
+        android:layout_toRightOf="@+id/txtVRate"
+        android:layout_toEndOf="@+id/txtVRate" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -104,7 +104,7 @@
         android:inputType="number"
         android:ems="10"
         android:id="@+id/edtxtTotal"
-        android:layout_alignTop="@+id/totalTextView"
+        android:layout_alignTop="@+id/txtVTotal"
         android:layout_centerHorizontal="true" />
 
     <Button
