@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -50,6 +52,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static InputStream is = null;
     NumberPicker noPicker = null;
     Date dt = null;
+    static float rate = 0;
+    EditText edTxtPlateNo = null;
+    TextView txtVStartTime = null;
+    TextView txtVEndTime = null;
+    TextView txtVRate = null;
+    TextView txtVTotal = null;
 
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_SANDBOX;
     // note that these credentials will differ between live & sandbox
@@ -81,6 +89,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
+        edTxtPlateNo = (EditText)findViewById(R.id.edTxtPlateNo);
+        txtVStartTime = (TextView)findViewById(R.id.txtVStartTime);
+        txtVEndTime = (TextView)findViewById(R.id.txtVEndTime);
+        txtVRate = (TextView)findViewById(R.id.txtVPrice);
+        txtVTotal = (TextView)findViewById(R.id.txtVTotalPrice);
+
+
         Button pay = (Button) findViewById(R.id.btnPaypal);
         pay.setOnClickListener(this);
 
@@ -99,11 +114,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
           /* display start time */
 //        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        TextView textViewct = (TextView)findViewById(R.id.txtVStartTime);
+
         dt = new Date();
-        String strDateFormat = "HH:mm:ss a";
+        String strDateFormat = "HH:mm:ss";
         SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
-        textViewct.setText(sdf.format(dt));
+        txtVStartTime.setText(sdf.format(dt));
 
 
         /* number picker for time -hour and display end time*/
@@ -119,10 +134,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Date dtct = new Date();
                 long newTime = dt.getTime() + (increment)*3600000;
                 Date newData = new Date(newTime);
-                String strDateFormat = "HH:mm:ss a";
+                String strDateFormat = "HH:mm:ss";
                 SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
-                TextView endtextView = (TextView)findViewById(R.id.txtVEndTime);
-                endtextView.setText(sdf.format(newData));
+                txtVEndTime.setText(sdf.format(newData));
+
+                float total = rate * increment;
+                txtVTotal.setText(String.valueOf(total));
 
             }
         });
@@ -134,24 +151,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TextView textViewDate = (TextView)findViewById(R.id.txtVCurrentDate);
         textViewDate.setText(simpleDate.format(date));
 
-//        Button buttnnPaypal = (Button) findViewById(R.id.btnPaypal);
-//        buttnnPaypal.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                List<NameValuePair> params = new
-//                        ArrayList<NameValuePair>();
-//                params.add(new
-//                        BasicNameValuePair("user", "popo"));
-//                String strURL = "http://localhost/webServiceJSON/helloJSON.php";
-//            /*JSONParser objJSONParser = new JSONParser();*/
-//                JSONObject jsonObj =
-//                        makeHttpRequest(strURL, "POST", params);
-//                String strFromPHP = jsonObj.optString("message");
-//                EditText editTextRate = (EditText) findViewById(R.id.edtxtRate);
-//                editTextRate.setText(strFromPHP);
-//            }
-//        });
-//        super.onSaveInstanceState(savedInstanceState);
+
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("selectFN","fnGetParkRate"));
+//                params.add(new BasicNameValuePair("email", "kuhn96@gmail.com"));
+//                params.add(new BasicNameValuePair("password", "Kuhn@@@@"));
+                String strURL = "http://172.27.35.1/parkingDB/showParking.php";
+//                String strURL = "http://pmot-web.192.168.1.13.xip.io/api/v1/auth/login";
+                /*JSONParser objJSONParser = new JSONParser();*/
+                final JSONObject jsonObj =
+                        makeHttpRequest(strURL, "POST", params);
+
+                new Thread() {
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                String strFromPHP = null;
+                                strFromPHP = jsonObj.optString("rate");
+                                rate = Float.parseFloat(strFromPHP);
+
+                                txtVRate.setText(strFromPHP);
+                            }
+                        });
+                    }
+                }.start();
+            }
+        };
+        Thread thr = new Thread(run);
+        thr.start();
 
     }
 
@@ -219,7 +250,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             jObj = new JSONObject(json);
         } catch (JSONException e) {
+            try {
+                JSONArray jsnArr = new JSONArray(json);
+                jObj = jsnArr.getJSONObject(0);
+            }catch(Exception ex)
+            {
             // Log.e("JSON Parser", "Error parsing data " + e.toString());
+            }
         }
 
         // return JSON String
@@ -235,35 +272,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onClickPayPal(View v) {
-        Runnable run = new Runnable() {
-            @Override
-            public void run() {
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
-//                params.add(new BasicNameValuePair("email", "kuhn96@gmail.com"));
-//                params.add(new BasicNameValuePair("password", "Kuhn@@@@"));
-                String strURL = "http://192.168.253.8/webServiceJSON/helloJSON.php";
-//                String strURL = "http://pmot-web.192.168.1.13.xip.io/api/v1/auth/login";
-                /*JSONParser objJSONParser = new JSONParser();*/
-                final JSONObject jsonObj =
-                        makeHttpRequest(strURL, "POST", params);
 
-                    new Thread() {
-                        public void run() {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    String strFromPHP = null;
-                                    strFromPHP = jsonObj.optString("message");
-                                    TextView textView = (TextView)findViewById(R.id.txtVPrice);
-                                    textView.setText(strFromPHP);
-                                }
-                            });
-                        }
-                    }.start();
-            }
-        };
-        Thread thr = new Thread(run);
-        thr.start();
     }
 
     @Override
@@ -277,24 +286,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //   - PAYMENT_INTENT_AUTHORIZE to only authorize payment and capture funds later.
                 //   - PAYMENT_INTENT_ORDER to create a payment for authorization and capture
                 //     later via calls from your server.
-                PayPalPayment thingToBuy= new PayPalPayment(new BigDecimal("10"), "USD",
+
+                PayPalPayment thingToBuy= new PayPalPayment(new BigDecimal(txtVTotal.getText().toString()), "MYR",
                         "HeadSet", PayPalPayment.PAYMENT_INTENT_SALE);
                 Intent intent = new Intent(MainActivity.this,
                         PaymentActivity.class);
                 // send the same configuration for restart resiliency
                 intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-                intent.putExtra(PaymentActivity.EXTRA_PAYMENT,  thingToBuy);
+                intent.putExtra(PaymentActivity.EXTRA_PAYMENT, thingToBuy);
                 startActivityForResult(intent, REQUEST_CODE_PAYMENT);
+
+                Runnable run = new Runnable() {
+                    @Override
+                    public void run() {
+                        List<NameValuePair> params = new ArrayList<NameValuePair>();
+                        params.add(new BasicNameValuePair("selectFN","fnInsert"));
+                        params.add(new BasicNameValuePair("plate_num",edTxtPlateNo.getText().toString().trim()));
+                        params.add(new BasicNameValuePair("parking_time",txtVEndTime.getText().toString()));
+                        params.add(new BasicNameValuePair("parking_duration",noPicker.getValue() + ""));
+                        params.add(new BasicNameValuePair("parking_amount",txtVTotal.getText().toString()));
+
+                        String strURL = "http://172.27.35.1/parkingDB/showParking.php";
+
+                /*JSONParser objJSONParser = new JSONParser();*/
+                        final JSONObject jsonObj =
+                                makeHttpRequest(strURL, "POST", params);
+
+                    }
+                };
+                Thread thr = new Thread(run);
+                thr.start();
+
                 break;
 
         }
     }
-
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == REQUEST_CODE_PAYMENT){
             if(resultCode == Activity.RESULT_OK){
                 PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
-                   if(confirm == null){
+                   if(confirm != null){
                        try{
                            System.out.println("Responses" + confirm);
 
@@ -305,9 +337,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                            JSONObject obj= new JSONObject(confirm.toJSONObject().toString());
 
                            String paymentID = obj.getJSONObject("response").getString("id");
+                           final String objPaymentStatus = obj.getJSONObject("response").getString("state");
                            System.out.println("payment id: -==" +paymentID);
 
                            Toast.makeText(getApplicationContext(), paymentID, Toast.LENGTH_LONG).show();
+
+                           Runnable run = new Runnable() {
+                               @Override
+                               public void run() {
+                                   List<NameValuePair> params = new ArrayList<NameValuePair>();
+                                   params.add(new BasicNameValuePair("selectFN","fnUpdatePayment"));
+                                   params.add(new BasicNameValuePair("plate_num",edTxtPlateNo.getText().toString().trim()));
+                                   params.add(new BasicNameValuePair("paymentStat",objPaymentStatus));
+                                   String strURL = "http://172.27.35.1/parkingDB/showParking.php";
+
+                /*JSONParser objJSONParser = new JSONParser();*/
+                                   final JSONObject jsonObj =
+                                           makeHttpRequest(strURL, "POST", params);
+
+                               }
+                           };
+                           Thread thr = new Thread(run);
+                           thr.start();
+
 
                        }catch(JSONException e){
                            Log.e("Payment demo", "failure occured!", e);
