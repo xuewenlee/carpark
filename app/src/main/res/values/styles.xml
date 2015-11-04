@@ -8,4 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name = "AppBasetheme" parent = "android:Theme.Light"></style>
+
+    <!--<style name = "AppTheme" parent = "AppBasetheme"></style>-->
+
 </resources>

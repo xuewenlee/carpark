@@ -1,12 +1,23 @@
 package com.example.xuewen.carpark;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
+import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -26,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,17 +45,49 @@ import java.util.Date;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     static InputStream is = null;
     NumberPicker noPicker = null;
     Date dt = null;
+
+    private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_SANDBOX;
+    // note that these credentials will differ between live & sandbox
+// environments.
+    private static final String CONFIG_CLIENT_ID = "AWUgPpSHbB9wnK2Oalw3KBEZOo2eb8B0alr6mnFkDk7MqnyIK5PHGSYTfHepJox1fq32m6LbJHdZ3HLV";
+    private static final int REQUEST_CODE_PAYMENT = 1;
+
+    private static PayPalConfiguration config = new PayPalConfiguration()
+        .environment(CONFIG_ENVIRONMENT)
+        .clientId(CONFIG_CLIENT_ID)
+        // the following are only used in PayPalFuturePaymentActivity.
+        .merchantName("Hipster Store")
+        .merchantPrivacyPolicyUri(
+            Uri.parse("https://www.example.com/privacy"))
+        .merchantUserAgreementUri(
+            Uri.parse("https://www.example.com/legal"));
+
+
+
+
+
+
+//    PayPalPaymentthingToBuy;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
+
+        Button pay = (Button) findViewById(R.id.btnPaypal);
+        pay.setOnClickListener(this);
+
+        Intent intent = new Intent(this, PayPalService.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+        startService(intent);
+
 
 //        NTPUDPClient timeClient = new NTPUDPClient();
 //        InetAddress inetAddress = InetAddress.getByName(TIME_SERVER);
@@ -79,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
                 TextView endtextView = (TextView)findViewById(R.id.txtVEndTime);
                 endtextView.setText(sdf.format(newData));
+
             }
         });
 
@@ -108,16 +153,12 @@ public class MainActivity extends AppCompatActivity {
 //        });
 //        super.onSaveInstanceState(savedInstanceState);
 
-
     }
-
 
 
     public JSONObject makeHttpRequest(String url, final String method,
             final List<NameValuePair> params)
     {
-
-
         InputStream is = null;
         String json = "";
         JSONObject jObj = null;
@@ -198,14 +239,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("email", "kuhn96@gmail.com"));
-                params.add(new BasicNameValuePair("password", "Kuhn@@@@"));
-//                String strURL = "http://192.168.1.16/webServiceJSON/helloJSON.php";
-                String strURL = "http://pmot-web.192.168.1.13.xip.io/api/v1/auth/login";
-        /*JSONParser objJSONParser = new JSONParser();*/
+//                params.add(new BasicNameValuePair("email", "kuhn96@gmail.com"));
+//                params.add(new BasicNameValuePair("password", "Kuhn@@@@"));
+                String strURL = "http://192.168.253.8/webServiceJSON/helloJSON.php";
+//                String strURL = "http://pmot-web.192.168.1.13.xip.io/api/v1/auth/login";
+                /*JSONParser objJSONParser = new JSONParser();*/
                 final JSONObject jsonObj =
                         makeHttpRequest(strURL, "POST", params);
-
 
                     new Thread() {
                         public void run() {
@@ -213,21 +253,81 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     String strFromPHP = null;
-                                    strFromPHP = jsonObj.optString("token");
-                                    TextView textView = (TextView)findViewById(R.id.txtVRate);
+                                    strFromPHP = jsonObj.optString("message");
+                                    TextView textView = (TextView)findViewById(R.id.txtVPrice);
                                     textView.setText(strFromPHP);
                                 }
                             });
                         }
                     }.start();
-
-
             }
         };
         Thread thr = new Thread(run);
         thr.start();
     }
 
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
 
+            case R.id.btnPaypal:
 
+                // PAYMENT_INTENT_SALE will cause the payment to complete immediately.
+                // Change PAYMENT_INTENT_SALE to
+                //   - PAYMENT_INTENT_AUTHORIZE to only authorize payment and capture funds later.
+                //   - PAYMENT_INTENT_ORDER to create a payment for authorization and capture
+                //     later via calls from your server.
+                PayPalPayment thingToBuy= new PayPalPayment(new BigDecimal("10"), "USD",
+                        "HeadSet", PayPalPayment.PAYMENT_INTENT_SALE);
+                Intent intent = new Intent(MainActivity.this,
+                        PaymentActivity.class);
+                // send the same configuration for restart resiliency
+                intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+                intent.putExtra(PaymentActivity.EXTRA_PAYMENT,  thingToBuy);
+                startActivityForResult(intent, REQUEST_CODE_PAYMENT);
+                break;
+
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if (requestCode == REQUEST_CODE_PAYMENT){
+            if(resultCode == Activity.RESULT_OK){
+                PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+                   if(confirm == null){
+                       try{
+                           System.out.println("Responses" + confirm);
+
+                           // TODO: send 'confirm' to your server for verification.
+
+                           Log.i("Paypal Payments", confirm.toJSONObject().toString());
+
+                           JSONObject obj= new JSONObject(confirm.toJSONObject().toString());
+
+                           String paymentID = obj.getJSONObject("response").getString("id");
+                           System.out.println("payment id: -==" +paymentID);
+
+                           Toast.makeText(getApplicationContext(), paymentID, Toast.LENGTH_LONG).show();
+
+                       }catch(JSONException e){
+                           Log.e("Payment demo", "failure occured!", e);
+                       }
+                   }
+                    else if(requestCode == Activity.RESULT_CANCELED){
+                       Log.i("Payment demo", "The user cancelled");
+
+                   }
+                    else if(requestCode == PaymentActivity.RESULT_EXTRAS_INVALID){
+                       Log.i("Payment demo", "Invalid payment Submitted");
+
+                    }
+            }
+        }
+    }
+
+    /* stop PayPalService */
+    public void onDestroy(){
+        stopService(new Intent(this, PayPalService.class));
+        super.onDestroy();
+    }
 }

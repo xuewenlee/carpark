@@ -19,6 +19,26 @@
         </activity>
         <activity android:name=".TestActivity" >
         </activity>
+
+        <uses-permission android:name="android.permission.CAMERA"/>
+        <uses-permission android:name="android.permission.VIBRATE"/>
+        <uses-feature android:name="android.hardware.camera" android:required="false"/>
+        <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+        <!-- for most things, including card.io &paypal -->
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+        <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+        <uses-permission android:name="android.permission.INTERNET"/>
+        <action android:name="android.intent.action.MAIN"/>
+        <category android:name="android.intent.category.LAUNCHER"/>
+        <service android:name="com.paypal.android.sdk.payments.PayPalService" android:exported="false"/>
+        <activity android:name="com.paypal.android.sdk.payments.PaymentActivity"/>
+        <activity android:name="com.paypal.android.sdk.payments.LoginActivity"/>
+        <activity android:name="com.paypal.android.sdk.payments.PaymentMethodActivity"/>
+        <activity android:name="com.paypal.android.sdk.payments.PaymentConfirmActivity"/>
+        <activity android:name="com.paypal.android.sdk.payments.PayPalFuturePaymentActivity"/>
+        <activity android:name="com.paypal.android.sdk.payments.FuturePaymentConsentActivity"/>
+        <activity android:name="com.paypal.android.sdk.payments.FuturePaymentInfoActivity"/>
+        <activity android:name="io.card.payment.DataEntryActivity"/>
     </application>
 
 </manifest>

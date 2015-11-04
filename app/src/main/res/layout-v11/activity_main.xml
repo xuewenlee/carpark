@@ -151,9 +151,8 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Total Price"
         android:id="@+id/txtVTotalPrice"
-        android:layout_alignTop="@+id/txtVTotal"
-        android:layout_alignRight="@+id/edTxtPlateNo"
-        android:layout_alignEnd="@+id/edTxtPlateNo" />
+        android:layout_below="@+id/txtVRate"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
