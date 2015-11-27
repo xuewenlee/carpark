@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Total :"
+        android:text="Total (RM) :"
         android:id="@+id/txtVTotal"
         android:layout_above="@+id/btnPaypal"
         android:layout_alignParentLeft="true"
@@ -84,8 +84,8 @@
         android:id="@+id/btnPaypal"
         android:onClick="onClickPayPal"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/txtVTotal"
-        android:layout_toEndOf="@+id/txtVTotal" />
+        android:layout_alignRight="@+id/txtVRate"
+        android:layout_alignEnd="@+id/txtVRate" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -163,5 +163,18 @@
         android:layout_alignTop="@+id/txtVRate"
         android:layout_toRightOf="@+id/txtVStartTime"
         android:layout_toEndOf="@+id/txtVStartTime" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/txtVNoti"
+        android:layout_below="@+id/txtVTotalPrice"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="showNotification"/>
+
+
 
 </RelativeLayout>
