@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 /**
- * Created by xuewen on 27/11/2015.
+ * Created by xuewen on 27/11/2015. new notification for the aps
  */
 public class MoreInfoNotification extends Activity {
 
