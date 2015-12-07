@@ -71,8 +71,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Button"
-        android:id="@+id/button"
-        android:onClick="testing"
+        android:id="@+id/buttonTest"
+        android:onClick="onClickTest"
         android:layout_below="@+id/txtVTotal"
         android:layout_alignLeft="@+id/edTxtPlateNo"
         android:layout_alignStart="@+id/edTxtPlateNo" />
@@ -142,14 +142,14 @@
         android:onClick="onClickNumberPicker"
         android:orientation="horizontal"
         android:layout_below="@+id/edTxtPlateNo"
-        android:layout_alignRight="@+id/button"
-        android:layout_alignEnd="@+id/button" />
+        android:layout_alignRight="@+id/buttonTest"
+        android:layout_alignEnd="@+id/buttonTest" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Total Price"
+        android:text="0.6"
         android:id="@+id/txtVTotalPrice"
         android:layout_below="@+id/txtVRate"
         android:layout_centerHorizontal="true" />
@@ -175,6 +175,15 @@
         android:layout_alignParentEnd="true"
         android:onClick="showNotification"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="invoke noti"
+        android:id="@+id/btnTest"
+        android:layout_above="@+id/buttonTest"
+        android:layout_alignRight="@+id/txtVCurrentDate"
+        android:layout_alignEnd="@+id/txtVCurrentDate"
+        android:onClick="fnCallNotif"/>
 
 
 </RelativeLayout>
