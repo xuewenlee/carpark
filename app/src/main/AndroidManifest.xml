@@ -35,8 +35,6 @@ INTERNET
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TestActivity" >
-        </activity>
 
         <uses-permission android:name="android.permission.WRITE_SETTINGS" />
         <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -70,7 +68,6 @@ INTERNET
         <activity android:name="com.paypal.android.sdk.payments.FuturePaymentConsentActivity" />
         <activity android:name="com.paypal.android.sdk.payments.FuturePaymentInfoActivity" />
         <activity android:name="io.card.payment.DataEntryActivity" />
-
         <activity
             android:name=".MoreInfoNotification"
             android:label="More on Notification"
@@ -79,17 +76,13 @@ INTERNET
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
-        <activity android:name=".SplashScreen">
+        <activity android:name=".SplashScreen" >
             <intent-filter>
-                <action android:name = "android.intent.action.MAIN"/>
-                <category android:name ="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
-
-
     </application>
 
 </manifest>

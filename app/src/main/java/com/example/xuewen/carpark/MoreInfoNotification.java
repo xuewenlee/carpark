@@ -13,11 +13,15 @@ public class MoreInfoNotification extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.more_info_notific);
+        setContentView(R.layout.activity_more_info_notific);
     }
 
     public void onClickMain(View view) {
         Intent a = new Intent(MoreInfoNotification.this, MainActivity.class);
         startActivity(a);
+    }
+
+    public void onClickEnd(View view) {
+       finish();
     }
 }

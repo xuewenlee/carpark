@@ -45,9 +45,6 @@ public class Connection {
                 // request method is POST
                 // defaultHttpClient
                 DefaultHttpClient httpClient = new DefaultHttpClient();
-//                String paramString = URLEncodedUtils.format(params, "utf-8");
-//                url += "?" + paramString;
-//                url = URLDecoder.decode(url);
                 HttpPost httpPost = new HttpPost(url);
                 httpPost.setEntity(new UrlEncodedFormEntity(params));
 
