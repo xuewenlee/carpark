@@ -12,9 +12,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Do you want to do a new transaction?"
+        android:text="Do you want to extend parking duration?"
         android:id="@+id/textView"
-        android:layout_marginBottom="154dp"
+        android:layout_marginBottom="141dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
@@ -22,12 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="   Parking time left LESS than"
+        android:text="   Parking time is LESS than"
         android:id="@+id/textView3"
-        android:layout_marginBottom="24dp"
-        android:layout_above="@+id/textView"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView" />
+        android:layout_above="@+id/textView4"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -35,12 +33,10 @@
         android:text="   Yes   "
         android:id="@+id/btnYes"
         android:onClick="onClickMain"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="45dp"
         android:layout_alignTop="@+id/textView"
         android:layout_alignLeft="@+id/textView3"
-        android:layout_alignStart="@+id/textView3"
-        android:layout_marginLeft="36dp"
-        android:layout_marginStart="36dp" />
+        android:layout_alignStart="@+id/textView3" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -50,10 +46,8 @@
         android:id="@+id/btnNo"
         android:onClick="onClickEnd"
         android:layout_alignTop="@+id/btnYes"
-        android:layout_toRightOf="@+id/btnYes"
-        android:layout_toEndOf="@+id/btnYes"
-        android:layout_marginLeft="36dp"
-        android:layout_marginStart="36dp" />
+        android:layout_alignRight="@+id/textView3"
+        android:layout_alignEnd="@+id/textView3" />
 
     <ImageView
         android:layout_width="wrap_content"

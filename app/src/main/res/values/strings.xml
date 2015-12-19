@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CarPark</string>
+    <string name="app_name">Alternative Parking Payment</string>
 
     <string-array name="durationHour">
         <item>1</item>

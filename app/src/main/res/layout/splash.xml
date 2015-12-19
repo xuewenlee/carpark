@@ -12,16 +12,17 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Alernate Parking Payment"
         android:id="@+id/textView2"
+        android:layout_marginBottom="172dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="142dp" />
+        android:layout_centerHorizontal="true" />
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="250dp"
+        android:layout_height="150dp"
         android:id="@+id/imageView"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/ic_launcher" />
+        android:src="@mipmap/ic_launcher"
+        android:layout_marginBottom="54dp"
+        android:layout_above="@+id/textView2"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

@@ -19,6 +19,7 @@ public class MoreInfoNotification extends Activity {
     public void onClickMain(View view) {
         Intent a = new Intent(MoreInfoNotification.this, MainActivity.class);
         startActivity(a);
+        finish();
     }
 
     public void onClickEnd(View view) {

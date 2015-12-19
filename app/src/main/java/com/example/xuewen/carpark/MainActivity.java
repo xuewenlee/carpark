@@ -71,8 +71,10 @@ public class MainActivity extends AppCompatActivity  {
     //use for Notification part
     public static Context ctx;
 
+//    String plateNumber = edTxtPlateNo.getText().toString().trim();
+
     Connection conn = new Connection();
-    private static String strURL = "http://10.73.32.45/parkingDB/showParking.php";
+    private static String strURL = "http://172.30.20.1/parkingDB/showParking.php";
 
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_SANDBOX;
     // note that these credentials will differ between live & sandbox
@@ -252,7 +254,7 @@ public class MainActivity extends AppCompatActivity  {
         //     later via calls from your server.
 
         PayPalPayment thingToBuy= new PayPalPayment(new BigDecimal(txtVTotal.getText().toString()), "MYR",
-                "HeadSet", PayPalPayment.PAYMENT_INTENT_SALE);
+                "Alternative Parking Payment", PayPalPayment.PAYMENT_INTENT_SALE);
         Intent intent = new Intent(MainActivity.this,
                 PaymentActivity.class);
         // send the same configuration for restart resiliency
@@ -301,9 +303,12 @@ public class MainActivity extends AppCompatActivity  {
 
                            String paymentID = obj.getJSONObject("response").getString("id");
                            final String objPaymentStatus = obj.getJSONObject("response").getString("state");
-                           System.out.println("payment id: -==" +paymentID);
+                           System.out.println("payment id: -==" + paymentID);
 
-                           Toast.makeText(getApplicationContext(), paymentID, Toast.LENGTH_LONG).show();
+//                           Toast.makeText(getApplicationContext(), paymentID, Toast.LENGTH_LONG).show();
+                           Toast.makeText(getApplicationContext(), edTxtPlateNo.getText().toString().trim() + " car parking is validated.", Toast.LENGTH_LONG).show();
+
+//                           Toast.makeText(getApplicationContext(), edTxtPlateNo.getText().toString().trim() + " parking is valided.", Toast.LENGTH_LONG).show();
 
                            /* update payment status to valid after payment is done successfully */
                            Runnable run = new Runnable() {
@@ -345,7 +350,7 @@ public class MainActivity extends AppCompatActivity  {
         double millis = (noHours)*60000;
         long timeMillis = (long)millis;
 
-        final CounterClass timer = new CounterClass(3000, 1000);
+        final CounterClass timer = new CounterClass(10000, 1000);
         timer.start();
 
     }
