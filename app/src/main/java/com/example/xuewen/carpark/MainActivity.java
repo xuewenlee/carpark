@@ -1,5 +1,10 @@
 package com.example.xuewen.carpark;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.database.Cursor;
+import android.os.Bundle;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -17,9 +22,12 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.MediaBrowserServiceCompat;
+//import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.Button;
@@ -28,6 +36,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.Result;
 import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.paypal.android.sdk.payments.PayPalPayment;
 import com.paypal.android.sdk.payments.PayPalService;
@@ -50,13 +59,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
+
 import static android.widget.Toast.*;
+
+
 
 
 @TargetApi(Build.VERSION_CODES.GINGERBREAD)
 @SuppressLint("NewApi")
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
 
     static InputStream is = null;
     NumberPicker noPicker = null;
@@ -66,15 +79,25 @@ public class MainActivity extends AppCompatActivity  {
     TextView txtVStartTime = null;
     TextView txtVEndTime = null;
     TextView txtVRate = null;
-    TextView txtVTotal = null;;
+    TextView txtVTotal = null;
+    TextView textViewDate = null;
     DateFormat formatter;
     //use for Notification part
+
+    String strgDate, strTime, strMsg;
+
+    QrSqlite dbQrCode;
+    String strCode, strCredit;
+//    String strTotalAmount;
+    String totalPayment;
+
     public static Context ctx;
 
 //    String plateNumber = edTxtPlateNo.getText().toString().trim();
 
     Connection conn = new Connection();
-    private static String strURL = "http://172.30.20.1/parkingDB/showParking.php";
+    private static String strURL = "http://192.168.43.14" +
+            "/parkingDB/showParking.php";
 
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_SANDBOX;
     // note that these credentials will differ between live & sandbox
@@ -106,7 +129,46 @@ public class MainActivity extends AppCompatActivity  {
         txtVEndTime = (TextView)findViewById(R.id.txtVEndTime);
         txtVRate = (TextView)findViewById(R.id.txtVPrice);
         txtVTotal = (TextView)findViewById(R.id.txtVTotalPrice);
+        textViewDate = (TextView)findViewById(R.id.txtVCurrentDate);
+//        strTotalAmount = txtVTotal.getText().toString();
 
+        /* number picker for time -hour and display end time*/
+        noPicker = (NumberPicker)findViewById(R.id.numberPicker);
+        noPicker.setMaxValue(9);
+        noPicker.setMinValue(1);
+        noPicker.setWrapSelectorWheel(true);
+        noPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+
+                if (edTxtPlateNo.getText().toString().trim().length() == 0) {
+                    Toast.makeText(MainActivity.this, "Please enter a plate number", Toast.LENGTH_SHORT).show();
+
+                } else if (edTxtPlateNo.getText().toString().trim().length() != 0) {
+
+//                    Toast.makeText(MainActivity.this, "not empty", Toast.LENGTH_SHORT).show();
+
+                    String number = "" + noPicker.getValue();
+                    long increment = Long.parseLong(number);
+                    Date dtct = new Date();
+                    // add duration to start time & change duration to second to get end time
+                    long newTime = dt.getTime() + (increment) * 3600000;
+                    Date newData = new Date(newTime);
+                    String strDateFormat = "HH:mm:ss";
+                    SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
+                    txtVEndTime.setText(sdf.format(newData));
+                    // add duration to start time & change duration to second to get end time
+
+
+                     /* multiply the rate per hours with duration(hours) to get total parking fees */
+                    float total = rate * increment;
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    totalPayment = df.format(total);
+                    txtVTotal.setText(totalPayment);
+
+                }
+            }
+        });
 
         /* Validate the plate number textfield is not empty */
         final Button pay = (Button) findViewById(R.id.btnPaypal);
@@ -114,11 +176,18 @@ public class MainActivity extends AppCompatActivity  {
             @Override
             public void onClick(View v) {
 
-                if(edTxtPlateNo.getText().toString().trim().length() == 0){
+                if(edTxtPlateNo.getText().toString().trim().length() == 0 ){
                     Toast.makeText(MainActivity.this, "Please enter a plate number", Toast.LENGTH_SHORT).show();
 
-                }else if(edTxtPlateNo.getText().toString().trim().length() != 0) {
+                }else if(totalPayment == null && edTxtPlateNo.getText().toString().trim().length() != 0){
+                    long increment = Long.parseLong("1");
+                    float total = rate * increment;
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    totalPayment = df.format(total);
+                    txtVTotal.setText(totalPayment);
+                    startPaypal();
 
+                }else if(edTxtPlateNo.getText().toString().trim().length() != 0) {
 //                    Toast.makeText(MainActivity.this, "not empty", Toast.LENGTH_SHORT).show();
                     startPaypal();
 
@@ -126,19 +195,41 @@ public class MainActivity extends AppCompatActivity  {
             }
         });
 
+        /* Validate the plate number textfield is not empty */
+        final Button payQr = (Button) findViewById(R.id.btnQr);
+        payQr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(edTxtPlateNo.getText().toString().trim().length() == 0){
+                    Toast.makeText(MainActivity.this, "Please enter a plate number", Toast.LENGTH_SHORT).show();
+
+                }else if(totalPayment == null && edTxtPlateNo.getText().toString().trim().length() != 0){
+                    long increment = Long.parseLong("1");
+                    float total = rate * increment;
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    totalPayment = df.format(total);
+                    txtVTotal.setText(totalPayment);
+                    startQrCode();
+
+                }else if(edTxtPlateNo.getText().toString().trim().length() != 0) {
+                    startQrCode();
+                }
+            }
+        });
 
         /* Start PayPalService when activity is created */
         Intent intent = new Intent(this, PayPalService.class);
         intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
         startService(intent);
 
-
         /* Display Today Date*/
         Date date = new Date();
         String strDate = "dd-MM-yyyy";
         SimpleDateFormat simpleDate = new SimpleDateFormat(strDate);
-        TextView textViewDate = (TextView)findViewById(R.id.txtVCurrentDate);
+        textViewDate = (TextView)findViewById(R.id.txtVCurrentDate);
         textViewDate.setText(simpleDate.format(date));
+
 
         /* Get parking rate and start time from server */
         Runnable run = new Runnable() {
@@ -196,45 +287,156 @@ public class MainActivity extends AppCompatActivity  {
         Thread thr = new Thread(run);
         thr.start();
 
-
-        /* number picker for time -hour and display end time*/
-        noPicker = (NumberPicker)findViewById(R.id.numberPicker);
-        noPicker.setMaxValue(9);
-        noPicker.setMinValue(1);
-        noPicker.setWrapSelectorWheel(true);
-        noPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-
-                if(edTxtPlateNo.getText().toString().trim().length() == 0){
-                    Toast.makeText(MainActivity.this, "Please enter a plate number", Toast.LENGTH_SHORT).show();
-
-                }else if(edTxtPlateNo.getText().toString().trim().length() != 0) {
-
-//                    Toast.makeText(MainActivity.this, "not empty", Toast.LENGTH_SHORT).show();
-
-                    String number = "" + noPicker.getValue();
-                    long increment = Long.parseLong(number);
-                    Date dtct = new Date();
-                    // add duration to start time & change duration to second to get end time
-                    long newTime = dt.getTime() + (increment) * 3600000;
-                    Date newData = new Date(newTime);
-                    String strDateFormat = "HH:mm:ss";
-                    SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
-                    txtVEndTime.setText(sdf.format(newData));
-
-                     /* multiply the rate per hours with duration(hours) to get total parking fees */
-                    float total = rate * increment;
-                    DecimalFormat df = new DecimalFormat("0.00");
-                    String totalPayment = df.format(total);
-                    txtVTotal.setText(totalPayment);
-                }
-
-
-            }
-        });
-
     } //end of onCreate
+
+    private void startQrCode(){
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
+        builder1.setMessage("Do you want to use existing QR code?");
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+
+
+                        dbQrCode = new QrSqlite(getApplicationContext());
+
+                        // Take existing QR code from sqlite databse to make payment
+                        Runnable run1 = new Runnable() {
+                            @Override
+                            public void run() {
+                                Cursor resultSet = dbQrCode.getReadableDatabase().rawQuery("Select * from qr;" , null);
+
+                                if(resultSet.moveToFirst()){
+                                    do{
+                                        strCode = resultSet.getString(resultSet.getColumnIndex("qrCode"));
+                                        strCredit = resultSet.getString(resultSet.getColumnIndex("qrCredit"));
+
+                                    }while(resultSet.moveToNext());
+                                }
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        AlertDialog.Builder builder2 = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
+                                        builder2.setTitle("Existing code     Balance ");
+                                        builder2.setMessage(strCode + "              RM " + strCredit);
+                                        builder2.setCancelable(true);
+                                        builder2.setPositiveButton(
+                                                "Pay",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+
+                                                        // Make payment with existing code
+                                                        Runnable runpay = new Runnable() {
+                                                            @Override
+                                                            public void run() {
+
+                                                                            /*Insert parking details*/
+                                                                List<NameValuePair> paramInsert = new ArrayList<NameValuePair>();
+                                                                paramInsert.add(new BasicNameValuePair("selectFN","fnInsert"));
+                                                                paramInsert.add(new BasicNameValuePair("plate_num",edTxtPlateNo.getText().toString().trim()));
+                                                                paramInsert.add(new BasicNameValuePair("parking_start_time",txtVStartTime.getText().toString()));
+                                                                paramInsert.add(new BasicNameValuePair("parking_end_time",txtVEndTime.getText().toString()));
+                                                                paramInsert.add(new BasicNameValuePair("parking_duration",noPicker.getValue() + ""));
+                                                                paramInsert.add(new BasicNameValuePair("parking_amount",txtVTotal.getText().toString()));
+
+                                                                final JSONObject jsonObjInsert =
+                                                                        conn.makeHttpRequest(strURL, "POST", paramInsert);
+
+                                                                            /*Update credit in QR code*/
+                                                                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                                                                params.add(new BasicNameValuePair("selectFN", "fnUpdateQrPayment"));
+                                                                params.add(new BasicNameValuePair("qrResult", strCode));
+                                                                params.add(new BasicNameValuePair("total_amount", totalPayment));
+
+                                                                final JSONObject jsonObj =
+                                                                        conn.makeHttpRequest(strURL, "POST", params);
+
+                                                                //get balance from database to update credit sqlite
+                                                                String updatedBalance = jsonObj.optString("balance");
+
+                                                                            /*update QR code credit in sqlite*/
+                                                                String sqludt = "UPDATE qr set qrCredit = '" + updatedBalance + "' where qrCode = '" + strCode + "';";
+                                                                dbQrCode.fnExecuteSql(sqludt, getApplicationContext());
+
+                                                                String qrcode = "QR CODE       RM";
+                                                                String strQryHistory = "Insert into history values( '" +  textViewDate.getText().toString() + "', '" + txtVStartTime.getText().toString() + "', '" + qrcode + "', '" + totalPayment + "');";
+                                                                dbQrCode.fnExecuteSql(strQryHistory, getApplicationContext());
+
+                                                                            /*update payment status of parking info*/
+                                                                List<NameValuePair> paramStatus = new ArrayList<NameValuePair>();
+                                                                paramStatus.add(new BasicNameValuePair("selectFN","fnUpdatePayment"));
+                                                                paramStatus.add(new BasicNameValuePair("plate_num",edTxtPlateNo.getText().toString().trim()));
+                                                                paramStatus.add(new BasicNameValuePair("paymentStat","approved"));
+
+                                                                final JSONObject jsonObjStatus =
+                                                                        conn.makeHttpRequest(strURL, "POST", paramStatus);
+
+                                                            }
+                                                        };
+                                                        Thread thrpay = new Thread(runpay);
+                                                        thrpay.start();
+
+                                                                    /* Countdown the parking time */
+                                                        double hours = noPicker.getValue();
+                                                        double noHours = hours - 0.5;
+                                                        double millis = (noHours)*60000;
+                                                        long timeMillis = (long)millis;
+
+                                                        final CounterClass timer = new CounterClass(10000, 1000);
+                                                        timer.start();
+
+                                                        Toast.makeText(getApplicationContext(), edTxtPlateNo.getText().toString().trim() + " car parking is validated.", Toast.LENGTH_LONG).show();
+
+                                                    }
+                                                }
+                                        );
+                                        AlertDialog alert12 = builder2.create();
+                                        alert12.show();
+                                    }
+
+                                });
+                            }
+                        };
+                        Thread thr = new Thread(run1);
+                        thr.start();
+
+                        dialog.cancel();
+                    }
+                });
+
+        //Alertdialog for "No" - start scanning new QR code
+        builder1.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //                    Toast.makeText(MainActivity.this, "not empty", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MainActivity.this, QrActivity.class);
+                        intent.putExtra("varTotalAmount", totalPayment);
+                        intent.putExtra("plateNumber", edTxtPlateNo.getText().toString().trim());
+                        intent.putExtra("date", textViewDate.getText().toString());
+                        intent.putExtra("startTime", txtVStartTime.getText().toString());
+                        intent.putExtra("endTime", txtVEndTime.getText().toString());
+                        intent.putExtra("duration", noPicker.getValue()+"");
+                        intent.putExtra("total", txtVTotal.getText().toString());
+                        startActivity(intent);
+
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
+    public void fnDisplayToastMsg(String strText){
+        Toast tst = Toast.makeText(getApplicationContext(), strText, Toast.LENGTH_LONG);
+        tst.show();
+    }
+
 
     public void fnCallNotif()
     {
@@ -254,7 +456,7 @@ public class MainActivity extends AppCompatActivity  {
         //     later via calls from your server.
 
         PayPalPayment thingToBuy= new PayPalPayment(new BigDecimal(txtVTotal.getText().toString()), "MYR",
-                "Alternative Parking Payment", PayPalPayment.PAYMENT_INTENT_SALE);
+                "Green Electronic Parking Payment", PayPalPayment.PAYMENT_INTENT_SALE);
         Intent intent = new Intent(MainActivity.this,
                 PaymentActivity.class);
         // send the same configuration for restart resiliency
@@ -310,6 +512,8 @@ public class MainActivity extends AppCompatActivity  {
 
 //                           Toast.makeText(getApplicationContext(), edTxtPlateNo.getText().toString().trim() + " parking is valided.", Toast.LENGTH_LONG).show();
 
+                           dbQrCode = new QrSqlite(getApplicationContext());
+
                            /* update payment status to valid after payment is done successfully */
                            Runnable run = new Runnable() {
                                @Override
@@ -322,6 +526,11 @@ public class MainActivity extends AppCompatActivity  {
                                     /*JSONParser objJSONParser = new JSONParser();*/
                                    final JSONObject jsonObj =
                                            conn.makeHttpRequest(strURL, "POST", params);
+
+                                   String paypal = "PayPal        RM";
+
+                                   String strQryHistory = "Insert into history values( '" +  textViewDate.getText().toString() + "', '" + txtVStartTime.getText().toString() + "', '" + paypal + "', '" + totalPayment + "');";
+                                   dbQrCode.fnExecuteSql(strQryHistory, getApplicationContext());
 
                                }
                            };
@@ -366,6 +575,24 @@ public class MainActivity extends AppCompatActivity  {
         getMenuInflater().inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
+    @Override
+    public void handleResult(Result result) {
+        Log.e("handler", result.getText()); // Prints scan results
+        Log.e("handler", result.getBarcodeFormat().toString()); // Prints the scan format (qrcode)
+
+        // show the scanner result into dialog box.
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Scan Result");
+        builder.setMessage(result.getText());
+        AlertDialog alert1 = builder.create();
+        alert1.show();
+
+        // If you would like to resume scanning, call this method below:
+        // mScannerView.resumeCameraPreview(this);
+
+    }
+
 
     /*countdown the time*/
 //    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
@@ -412,5 +639,29 @@ public class MainActivity extends AppCompatActivity  {
             finish();
 
         }
+
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.QrHis) {
+            fnQrHistory(this.getCurrentFocus());
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void fnQrHistory(View currentFocus){
+        Intent intent = new Intent(this, QrHistory.class);
+        startActivityForResult(intent, 0);
+    }
+
 }

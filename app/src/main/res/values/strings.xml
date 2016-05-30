@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Alternative Parking Payment</string>
+    <string name="app_name">Green Electronic Parking Payment</string>
 
     <string-array name="durationHour">
         <item>1</item>
@@ -12,5 +12,7 @@
         <item>8</item>
         <item>9</item>
     </string-array>
+    <string name="title_activity_qr">QrActivity</string>
+    <string name="title_activity_qr_history">Transaction History</string>
 
 </resources>

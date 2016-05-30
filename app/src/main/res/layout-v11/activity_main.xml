@@ -34,15 +34,15 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Time :"
         android:id="@+id/txtVTime"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/numberPicker"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="13dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Rate per hour       :      RM"
+        android:text="Rate per hour           :      RM"
         android:id="@+id/txtVRate"
         android:layout_marginBottom="17dp"
         android:layout_above="@+id/txtVTotal"
@@ -53,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Total                     :      RM"
+        android:text="Total                          :      RM"
         android:id="@+id/txtVTotal"
         android:layout_marginBottom="59dp"
         android:layout_above="@+id/btnPaypal"
@@ -81,7 +81,7 @@
         android:id="@+id/btnPaypal"
         android:background="@drawable/button"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -89,9 +89,10 @@
         android:text="Start Time"
         android:textColor="#000000"
         android:id="@+id/txtVStartTime"
+        android:layout_alignBaseline="@+id/txtVTime"
         android:layout_alignBottom="@+id/txtVTime"
-        android:layout_alignRight="@+id/txtVDate"
-        android:layout_alignEnd="@+id/txtVDate" />
+        android:layout_toEndOf="@+id/txtVTime"
+        android:layout_marginStart="11dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -101,15 +102,14 @@
         android:textStyle="bold"
         android:id="@+id/txtVEndTime"
         android:layout_marginRight="25dp"
-        android:layout_marginEnd="25dp"
-        android:layout_alignTop="@+id/txtVTo"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignBaseline="@+id/txtVTo"
+        android:layout_alignBottom="@+id/txtVTo"
+        android:layout_alignEnd="@+id/numberPicker" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Date                                :"
+        android:text="Date                                     :"
         android:id="@+id/txtVDate"
         android:layout_above="@+id/txtVRate"
         android:layout_alignParentLeft="true"
@@ -122,17 +122,16 @@
         android:text="Today Date"
         android:id="@+id/txtVCurrentDate"
         android:layout_alignTop="@+id/txtVDate"
-        android:layout_alignLeft="@+id/txtVTo"
-        android:layout_alignStart="@+id/txtVTo" />
+        android:layout_alignEnd="@+id/txtVTotalPrice"
+        android:layout_marginEnd="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="to"
         android:id="@+id/txtVTo"
-        android:layout_alignTop="@+id/txtVStartTime"
-        android:layout_alignLeft="@+id/numberPicker"
-        android:layout_alignStart="@+id/numberPicker" />
+        android:layout_alignBottom="@+id/txtVTime"
+        android:layout_toEndOf="@+id/txtVDate" />
 
     <NumberPicker
         android:layout_width="wrap_content"
@@ -141,8 +140,7 @@
         android:onClick="onClickNumberPicker"
         android:orientation="horizontal"
         android:layout_below="@+id/edTxtPlateNo"
-        android:layout_toLeftOf="@+id/txtVEndTime"
-        android:layout_toStartOf="@+id/txtVEndTime" />
+        android:layout_toEndOf="@+id/txtVTotal" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -152,8 +150,7 @@
         android:textStyle="bold"
         android:textColor="#000000"
         android:id="@+id/txtVTotalPrice"
-        android:layout_alignBottom="@+id/txtVTotal"
-        android:layout_alignRight="@+id/numberPicker"
+        android:layout_alignTop="@+id/txtVTotal"
         android:layout_alignEnd="@+id/numberPicker" />
 
     <TextView
@@ -164,8 +161,18 @@
         android:textColor="#000000"
         android:id="@+id/txtVPrice"
         android:layout_below="@+id/txtVDate"
-        android:layout_alignRight="@+id/txtVTotalPrice"
-        android:layout_alignEnd="@+id/txtVTotalPrice" />
+        android:layout_alignEnd="@+id/numberPicker" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="pay with QR code"
+        android:id="@+id/btnQr"
+        android:textStyle="italic"
+        android:textColor="#F7FE2E"
+        android:background="@drawable/button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/txtVCurrentDate" />
 
 
 </RelativeLayout>

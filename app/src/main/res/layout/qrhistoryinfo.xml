@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date"
+        android:id="@+id/txtVwHDate"
+        android:layout_marginTop="63dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time"
+        android:id="@+id/txtVwHTime"
+        android:layout_marginStart="25dp"
+        android:layout_alignTop="@+id/txtVwHDate"
+        android:layout_toEndOf="@+id/txtVwHDate" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="QR Code"
+        android:id="@+id/txtVwHCode"
+        android:layout_alignTop="@+id/txtVwHTime"
+        android:layout_toStartOf="@+id/txtVwHAmount" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Amount"
+        android:id="@+id/txtVwHAmount"
+        android:layout_alignTop="@+id/txtVwHCode"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="23dp" />
+
+</RelativeLayout>
