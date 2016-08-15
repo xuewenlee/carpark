@@ -13,7 +13,6 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Plate Number           :"
         android:id="@+id/txtVPlateNo"
-        android:layout_alignBottom="@+id/edTxtPlateNo"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -21,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Duration (per hour) :"
+        android:text="Duration:"
         android:id="@+id/txtVDuration"
         android:layout_marginTop="72dp"
         android:layout_below="@+id/txtVPlateNo"
@@ -34,7 +33,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Time :"
         android:id="@+id/txtVTime"
-        android:layout_below="@+id/numberPicker"
+        android:layout_below="@+id/noPkrMinute"
         android:layout_alignParentStart="true"
         android:layout_marginTop="13dp" />
 
@@ -59,18 +58,6 @@
         android:layout_above="@+id/btnPaypal"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/edTxtPlateNo"
-        android:text=" "
-        android:maxLength="10"
-        android:digits="0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ"
-        android:minWidth="80dp"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/txtVRate"
-        android:layout_toEndOf="@+id/txtVRate" />
 
     <Button
         android:layout_width="wrap_content"
@@ -104,7 +91,7 @@
         android:layout_marginRight="25dp"
         android:layout_alignBaseline="@+id/txtVTo"
         android:layout_alignBottom="@+id/txtVTo"
-        android:layout_alignEnd="@+id/numberPicker" />
+        android:layout_alignEnd="@+id/noPkrMinute" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -136,22 +123,23 @@
     <NumberPicker
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/numberPicker"
+        android:id="@+id/noPkrMinute"
         android:onClick="onClickNumberPicker"
         android:orientation="horizontal"
-        android:layout_below="@+id/edTxtPlateNo"
-        android:layout_toEndOf="@+id/txtVTotal" />
+        android:layout_below="@+id/txtVPlateNo"
+        android:layout_toEndOf="@+id/txtVTotal"
+        android:layout_marginTop="20dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="0.6"
+        android:text="-"
         android:textStyle="bold"
         android:textColor="#000000"
         android:id="@+id/txtVTotalPrice"
         android:layout_alignTop="@+id/txtVTotal"
-        android:layout_alignEnd="@+id/numberPicker" />
+        android:layout_alignEnd="@+id/noPkrMinute" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -161,7 +149,7 @@
         android:textColor="#000000"
         android:id="@+id/txtVPrice"
         android:layout_below="@+id/txtVDate"
-        android:layout_alignEnd="@+id/numberPicker" />
+        android:layout_alignEnd="@+id/noPkrMinute" />
 
     <Button
         android:layout_width="wrap_content"
@@ -173,6 +161,40 @@
         android:background="@drawable/button"
         android:layout_alignParentBottom="true"
         android:layout_alignStart="@+id/txtVCurrentDate" />
+
+    <AutoCompleteTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/autoCTxtVw"
+        android:layout_alignParentTop="true"
+        android:dropDownWidth="match_parent"
+        android:layout_toEndOf="@+id/txtVRate" />
+
+    <NumberPicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/noPkrHour"
+        android:layout_toStartOf="@+id/txtVTo"
+        android:orientation="horizontal"
+        android:layout_above="@+id/txtVTime" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Hour"
+        android:id="@+id/txtVwHour"
+        android:layout_below="@+id/txtVDuration"
+        android:layout_toStartOf="@+id/txtVEndTime" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Minute"
+        android:id="@+id/txtVwMinute"
+        android:layout_alignTop="@+id/txtVwHour"
+        android:layout_toEndOf="@+id/txtVEndTime" />
 
 
 </RelativeLayout>

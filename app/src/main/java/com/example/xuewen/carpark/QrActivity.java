@@ -6,11 +6,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.preference.DialogPreference;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,17 +19,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.vision.CameraSource;
-import com.google.android.gms.vision.Detector;
-import com.google.android.gms.vision.barcode.Barcode;
-import com.google.android.gms.vision.barcode.BarcodeDetector;
+
 import com.google.zxing.Result;
 
 import org.apache.http.NameValuePair;
@@ -59,6 +52,8 @@ public class QrActivity extends AppCompatActivity implements ZXingScannerView.Re
     String strFromPHP;
      AlertDialog alert1;
     public static Context ctx;
+    View buttonPay;
+    Button bPay;
 
     Connection conn = new Connection();
     private static String strURL = "http://192.168.43.14/parkingDB/showParking.php";
@@ -79,12 +74,16 @@ public class QrActivity extends AppCompatActivity implements ZXingScannerView.Re
             }
         });
 
+
+
         ctx=this;
 
-        mScannerView = new ZXingScannerView(this);   // Programmatically initialize the scanner view
+
+        mScannerView = new ZXingScannerView(QrActivity.this);   // Programmatically initialize the scanner view
         setContentView(mScannerView);
-        mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.
+        mScannerView.setResultHandler(QrActivity.this); // Register ourselves as a handler for scan results.
         mScannerView.startCamera();         // Start camera
+
 
         Intent intent = getIntent();
         strTotal = intent.getStringExtra("varTotalAmount");
@@ -121,13 +120,17 @@ public class QrActivity extends AppCompatActivity implements ZXingScannerView.Re
         // show the scanner result into dialog box.
         builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
 
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.brush_opts_dialog,null);
-        builder.setView(dialogView);
-        Button btnPay = (Button)dialogView.findViewById(R.id.btnPay);
+//        LayoutInflater inflater = getLayoutInflater();
+//        final View dialogView = inflater.inflate(R.layout.brush_opts_dialog,null);
+//        builder.setView(dialogView);
 
+        builder.setCancelable(true);
 
-        builder.setTitle("Total Payment Amount = RM " + strTotal);
+//        buttonPay = (Button)dialogView.findViewById(R.id.btnPay);
+//        bPay = (Button)findViewById(R.id.btnPay);
+
+        strCode = rawResult.getText();
+
 
         Runnable runCredit = new Runnable() {
             AlertDialog dialog = null;
@@ -148,13 +151,142 @@ public class QrActivity extends AppCompatActivity implements ZXingScannerView.Re
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
                         System.out.println(strFromPHP + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-                        builder.setMessage("Credit Amount is RM " + strFromPHP);
-                        alert1=builder.create();
-                        alert1.show();
-                    }
-                });
+                        double codeCredit = Double.parseDouble(strFromPHP);
+                        double totalpayment = Double.parseDouble(strTotal);
+
+                        if (codeCredit == 0 || strFromPHP == null) {
+                            builder.setTitle("Invalid Code!!!");
+                            builder.setMessage("Please try other code.");
+
+                            mScannerView.stopCamera();
+                            builder.setPositiveButton(
+                                    "Try Again",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            alert1.cancel();
+                                            mScannerView = new ZXingScannerView(QrActivity.this);   // Programmatically initialize the scanner view
+                                            setContentView(mScannerView);
+                                            mScannerView.setResultHandler(QrActivity.this); // Register ourselves as a handler for scan results.
+                                            mScannerView.startCamera();
+
+                                        }
+                                    });
+
+                            builder.setNegativeButton(
+                                    "Back",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            Intent intent = new Intent(QrActivity.this, MainActivity.class);
+                                            startActivity(intent);
+                                        }
+                                    });
+
+                            alert1 = builder.create();
+                            alert1.show();
+
+                        }
+                        else if (codeCredit < totalpayment) {
+                            builder.setTitle("Not enough credit!!!");
+                            builder.setMessage("Please try other code.");
+                            alert1 = builder.create();
+                            alert1.show();
+
+                        }
+                        else if (codeCredit > totalpayment)
+
+                        {
+                            builder.setTitle("Total Payment Amount = RM " + strTotal);
+                            builder.setMessage("Credit Amount is RM " + strFromPHP);
+
+                            builder.setPositiveButton(
+                                    "PAY",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dbQrCode = new QrSqlite(getApplicationContext());
+
+                                            Runnable run = new Runnable() {
+                                                @Override
+                                                public void run() {
+
+                                                    /*Insert parking details*/
+                                                    List<NameValuePair> paramInsert = new ArrayList<NameValuePair>();
+                                                    paramInsert.add(new BasicNameValuePair("selectFN", "fnInsert"));
+                                                    paramInsert.add(new BasicNameValuePair("plate_num", plateNumber));
+                                                    paramInsert.add(new BasicNameValuePair("parking_start_time", startTime));
+                                                    paramInsert.add(new BasicNameValuePair("parking_end_time", endTime));
+                                                    paramInsert.add(new BasicNameValuePair("parking_duration", duration));
+                                                    paramInsert.add(new BasicNameValuePair("parking_amount", total));
+
+                                                    final JSONObject jsonObjInsert =
+                                                            conn.makeHttpRequest(strURL, "POST", paramInsert);
+
+                                                    /*Insert QR code into sqlite*/
+                                                    String strQry = "Insert into qr values( '" + strCode + "', '" + strFromPHP + "');";
+                                                    dbQrCode.fnExecuteSql(strQry, getApplicationContext());
+
+                                                    String qrcode = "QR CODE       RM";
+                                                    String strQryHistory = "Insert into history values( '" + date + "', '" + startTime + "', '" + qrcode + "', '" + strTotal + "');";
+                                                    dbQrCode.fnExecuteSql(strQryHistory, getApplicationContext());
+
+                                                    /*insert plate number into */
+                                                    String sqlPlate = "Insert into plate values( '" + plateNumber + "');";
+                                                    dbQrCode.fnExecuteSql(sqlPlate, getApplicationContext());
+
+                                                    /*Update credit in QR code*/
+                                                    List<NameValuePair> params = new ArrayList<NameValuePair>();
+                                                    params.add(new BasicNameValuePair("selectFN", "fnUpdateQrPayment"));
+                                                    params.add(new BasicNameValuePair("qrResult", rawResult.getText()));
+                                                    params.add(new BasicNameValuePair("total_amount", strTotal));
+
+                                                    final JSONObject jsonObj =
+                                                            conn.makeHttpRequest(strURL, "POST", params);
+
+                                                    //get balance from database to update credit sqlite
+                                                    String updatedBalance = jsonObj.optString("balance");
+
+                                                    /*update QR code credit in sqlite*/
+                                                    String sqludt = "UPDATE qr set qrCredit = '" + updatedBalance + "' where qrCode = '" + strCode + "';";
+                                                    dbQrCode.fnExecuteSql(sqludt, getApplicationContext());
+
+                                                    /*update payment status of parking info*/
+                                                    List<NameValuePair> paramStatus = new ArrayList<NameValuePair>();
+                                                    paramStatus.add(new BasicNameValuePair("selectFN", "fnUpdatePayment"));
+                                                    paramStatus.add(new BasicNameValuePair("plate_num", plateNumber));
+                                                    paramStatus.add(new BasicNameValuePair("paymentStat", "approved"));
+
+                                                    final JSONObject jsonObjStatus =
+                                                            conn.makeHttpRequest(strURL, "POST", paramStatus);
+
+                                                }
+                                            };
+                                            Thread thr = new Thread(run);
+                                            thr.start();
+
+                                            /* Countdown the parking time */
+                                            //                double hours = Double.parseDouble(noPicker);
+                                            //                double noHours = hours - 0.5;
+                                            //                double millis = (noHours)*60000;
+                                            //                long timeMillis = (long)millis;
+
+                                            final CounterClass timer = new CounterClass(10000, 1000);
+                                            timer.start();
+
+                                            Toast.makeText(getApplicationContext(), plateNumber + " car parking is validated.", Toast.LENGTH_LONG).show();
+
+                                            alert1.dismiss();
+                                        }
+                                    });
+                            alert1 = builder.create();
+                            alert1.show();
+
+                        }//end if else
+
+
+                                    }
+                        });//end runonunithread
 
 //                dialog = builder.create();
 
@@ -166,83 +298,9 @@ public class QrActivity extends AppCompatActivity implements ZXingScannerView.Re
 //        builder.setMessage(rawResult.getText());
 
 
-        strCode = rawResult.getText();
-//        strCredit = strFromPHP;
 
-        btnPay .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                dbQrCode = new QrSqlite(getApplicationContext());
 
-                Runnable run = new Runnable() {
-                    @Override
-                    public void run() {
-
-                        /*Insert parking details*/
-                        List<NameValuePair> paramInsert = new ArrayList<NameValuePair>();
-                        paramInsert.add(new BasicNameValuePair("selectFN","fnInsert"));
-                        paramInsert.add(new BasicNameValuePair("plate_num",plateNumber));
-                        paramInsert.add(new BasicNameValuePair("parking_start_time",startTime));
-                        paramInsert.add(new BasicNameValuePair("parking_end_time",endTime));
-                        paramInsert.add(new BasicNameValuePair("parking_duration",duration));
-                        paramInsert.add(new BasicNameValuePair("parking_amount",total));
-
-                        final JSONObject jsonObjInsert =
-                                conn.makeHttpRequest(strURL, "POST", paramInsert);
-
-                        /*Insert QR code into sqlite*/
-                        String strQry = "Insert into qr values( '" + strCode + "', '" + strFromPHP + "');";
-                        dbQrCode.fnExecuteSql(strQry, getApplicationContext());
-
-                        String qrcode = "QR CODE       RM";
-                        String strQryHistory = "Insert into history values( '" + date + "', '" + startTime + "', '" + qrcode + "', '" + strTotal + "');";
-                        dbQrCode.fnExecuteSql(strQryHistory, getApplicationContext());
-
-                        /*Update credit in QR code*/
-                        List<NameValuePair> params = new ArrayList<NameValuePair>();
-                        params.add(new BasicNameValuePair("selectFN", "fnUpdateQrPayment"));
-                        params.add(new BasicNameValuePair("qrResult", rawResult.getText()));
-                        params.add(new BasicNameValuePair("total_amount", strTotal));
-
-                        final JSONObject jsonObj =
-                                conn.makeHttpRequest(strURL, "POST", params);
-
-                        //get balance from database to update credit sqlite
-                        String updatedBalance = jsonObj.optString("balance");
-
-                        /*update QR code credit in sqlite*/
-                        String sqludt = "UPDATE qr set qrCredit = '" + updatedBalance + "' where qrCode = '" + strCode + "';";
-                        dbQrCode.fnExecuteSql(sqludt, getApplicationContext());
-
-                        /*update payment status of parking info*/
-                        List<NameValuePair> paramStatus = new ArrayList<NameValuePair>();
-                        paramStatus.add(new BasicNameValuePair("selectFN","fnUpdatePayment"));
-                        paramStatus.add(new BasicNameValuePair("plate_num",plateNumber));
-                        paramStatus.add(new BasicNameValuePair("paymentStat", "approved"));
-
-                        final JSONObject jsonObjStatus =
-                                conn.makeHttpRequest(strURL, "POST", paramStatus);
-
-                    }
-                };
-                Thread thr = new Thread(run);
-                thr.start();
-
-      /* Countdown the parking time */
-//                double hours = Double.parseDouble(noPicker);
-//                double noHours = hours - 0.5;
-//                double millis = (noHours)*60000;
-//                long timeMillis = (long)millis;
-
-                final CounterClass timer = new CounterClass(10000, 1000);
-                timer.start();
-
-                Toast.makeText(getApplicationContext(), plateNumber + " car parking is validated.", Toast.LENGTH_LONG).show();
-
-                alert1.dismiss();
-            }
-        });
 
 
 

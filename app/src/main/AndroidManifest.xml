@@ -93,6 +93,10 @@ INTERNET
             android:label="@string/title_activity_qr_history"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity android:name=".PlateNumberList" >
+        </activity>
+        <activity android:name=".QrInsertCode" >
+        </activity>
     </application>
 
 </manifest>

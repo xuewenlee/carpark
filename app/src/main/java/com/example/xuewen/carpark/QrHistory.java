@@ -1,5 +1,6 @@
 package com.example.xuewen.carpark;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -79,4 +80,10 @@ public class QrHistory extends AppCompatActivity {
         thr.start();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivityForResult(intent, 0);
+    }
 }
